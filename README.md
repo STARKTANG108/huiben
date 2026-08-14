@@ -3,7 +3,7 @@
 # 📚 Pictale · AI 儿童绘本创作平台
 
 **输入一个主题，AI 自动完成「写故事 → 画插画 → 配音 → 配乐 → 剪视频」，**
-**一键产出 绘本视频 / 定制绘本 PDF —— 不需要会画画、会剪辑、会写代码。**
+**一键产出 绘本视频 / 说书视频 —— 不需要会画画、会剪辑、会写代码。**
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/STARKTANG108/huiben)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
@@ -16,25 +16,19 @@
 
 Pictale 是一个 **AI 绘本制作平台**，把绘本创作的全流程自动化：
 
-- 🎬 给一个主题（如「月亮上的小兔子学会分享」）→ 约 **1 分钟**得到有配音、有配乐的**绘本短视频**
-- 📖 上传 3–5 张孩子照片 → AI 生成以孩子为主角的 **8 页定制绘本 PDF**（Flux 角色锁定，主角长相贯穿全书）
-- 🧬 你写一段人生故事 → 约 30 秒**治愈系短片**（《1000种人生》配方）
-- 📚 给一个书名 → 3 分钟**说书式视频**（《一生》式 + 开场动效）
-- ✂️ 一句话 brief → 分镜静帧 + 字幕 → **混剪预览成片**
+- 🎬 给一个主题（如「月亮上的小兔子学会分享」）→ 约 **1 分钟**得到有配音、有配乐的**儿童绘本短视频**
+- 📚 给一个书名（如《小王子》《活着》）→ 3 分钟**说书式视频**（《一生》式讲述 + 开场 8 秒图生视频动效）
 
-## ✨ 五大创作模块
+## ✨ 两大创作板块
 
-| 模块 | 入口 | 输入 → 输出 |
+| 板块 | 入口 | 输入 → 输出 |
 |------|------|-------------|
 | 🎬 儿童绘本视频 | `/pictale` | 主题 + 年龄段 → 故事/分镜/插画/配音/配乐 → 约 1 分钟竖屏成片 |
-| 📖 儿童定制绘本 | `/custom-book` | 3–5 张孩子照片 → 角色确认 → Flux 生成 8 页 → 精美 PDF |
-| 🧬 人生副本 | `/life` | 一段人生故事 → 先配音再出图 → 30 秒治愈短片 |
-| 📚 书籍剪辑 | `/book` | 书名 → 3 分钟说书视频（开场 8 秒图生视频） |
-| ✂️ 混剪视频 | `/cut` | 一句话 brief → 分镜静帧 + 字幕 → 预览成片 |
+| 📚 书籍剪辑 | `/book` | 书名 → 3 分钟说书视频（首尾帧开场动效 + MiniMax 配音 + 配乐） |
 
 ## 🔄 工作流程
 
-绘本视频全自动流水线（每步都可以在界面上单独执行 / 重做）：
+全自动流水线（每步都可以在界面上单独执行 / 重做）：
 
 ```
 输入主题
@@ -49,8 +43,8 @@ Pictale 是一个 **AI 绘本制作平台**，把绘本创作的全流程自动�
 - 🆓 **免费模型已接好**：生图 Pollinations（免费免 Key）、配音 Edge TTS（免费真人声），文本一键切换 DeepSeek / Gemini / Groq（填免费 Key）
 - 🔑 **Key 只在网页里配**：所有模型 Key 在 `/settings` 页面填写，存在你自己的部署实例里，**永不写入仓库**
 - 🔌 **Provider 可插拔**：每个能力一个接口（`backend/app/providers/`），Mock 随时换成真实模型
-- 🖼️ **角色一致性**：定制绘本用 Flux 角色锁定（正面/侧面/全身/表情四视图确认），同一主角贯穿 8 页
-- 📦 **数据持久化**：部署带持久卷，订单、Key、生成的作品重启不丢
+- 🖼️ **角色一致性**：绘本画面全程角色锁定，同一主角贯穿全片
+- 📦 **数据持久化**：部署带持久卷，配置、生成的作品重启不丢
 - 🚀 **一键部署**：Render / Railway / Zeabur / 本地 Docker
 
 ## 🚀 快速开始
@@ -96,7 +90,7 @@ docker compose up -d --build
 |----|------|
 | 前端 | Next.js 15 · TypeScript · Tailwind |
 | 后端 | FastAPI · Pydantic v2 |
-| 状态 | 内存 Store + SQLite（定制绘本订单持久化） |
+| 状态 | 内存 Store（可换 Redis/DB） |
 | 媒体 | 本地 `backend/storage/`（ffmpeg 合成） |
 
 ## 📐 目录结构
@@ -105,9 +99,9 @@ docker compose up -d --build
 huiben/
 ├── backend/
 │   ├── app/providers/    # 可插拔模型（文本/生图/配音/配乐/视频）
-│   ├── app/services/     # 流水线编排（pictale/life/book/cut/custom-book）
+│   ├── app/services/     # 流水线编排（绘本视频 / 书籍剪辑）
 │   ├── app/routers/      # REST API
-│   ├── app/store/        # 内存 Store + SQLite
+│   ├── app/store/        # 内存 Store
 │   ├── data/             # 运行时配置（Key，不入库）
 │   └── storage/          # 生成的图/音/视频（不入库）
 ├── frontend/             # Next.js 工作台
@@ -124,10 +118,12 @@ huiben/
 
 | 方法 | 路径 | 说明 |
 |------|------|------|
-| POST | `/api/projects` | 创建项目 |
+| POST | `/api/projects` | 创建绘本视频项目 |
 | GET | `/api/projects/{id}` | 项目状态 |
 | POST | `/api/projects/{id}/steps/{step}` | 执行单步 |
 | POST | `/api/projects/{id}/run` | 一键跑流水线（可带 `from_step`） |
+| POST | `/api/book` | 创建书籍剪辑项目 |
+| POST | `/api/book/{id}/run` | 一键跑书籍流水线 |
 | GET | `/api/projects/{id}/assets/{asset_id}` | 媒体文件 |
 | GET | `/api/providers` | 当前/可用 Provider |
 

@@ -26,30 +26,6 @@ export default function HomePage() {
 
         <div className="grid gap-5 sm:grid-cols-2">
           <Link
-            href="/creative"
-            className="rounded-[28px] bg-white/75 p-8 shadow-sm transition hover:bg-white sm:col-span-2"
-          >
-            <p className="font-display text-2xl text-[var(--ink)]">
-              AI Creative Director
-              <span className="ml-3 rounded-full bg-[var(--sand)] px-2.5 py-0.5 align-middle text-xs font-semibold text-[var(--ink-muted)]">
-                开发中
-              </span>
-            </p>
-            <p className="mt-2 text-sm leading-relaxed text-[var(--ink-muted)]">
-              Upload a product photo → cinematic ad concepts, storyboards &amp;
-              spots
-            </p>
-          </Link>
-          <Link
-            href="/custom-book"
-            className="rounded-[28px] bg-white/75 p-8 shadow-sm transition hover:bg-white sm:col-span-2"
-          >
-            <p className="font-display text-2xl text-[var(--ink)]">儿童定制绘本</p>
-            <p className="mt-2 text-sm leading-relaxed text-[var(--ink-muted)]">
-              半自动生产后台 · 角色确认 · Flux 8 页绘本 · PDF
-            </p>
-          </Link>
-          <Link
             href="/pictale"
             className="rounded-[28px] bg-white/75 p-8 shadow-sm transition hover:bg-white"
           >
@@ -59,30 +35,12 @@ export default function HomePage() {
             </p>
           </Link>
           <Link
-            href="/life"
-            className="rounded-[28px] bg-white/75 p-8 shadow-sm transition hover:bg-white"
-          >
-            <p className="font-display text-2xl text-[var(--ink)]">人生副本</p>
-            <p className="mt-2 text-sm leading-relaxed text-[var(--ink-muted)]">
-              《1000种人生》· 假如另一条路 · 约 30 秒试用
-            </p>
-          </Link>
-          <Link
             href="/book"
             className="rounded-[28px] bg-white/75 p-8 shadow-sm transition hover:bg-white"
           >
             <p className="font-display text-2xl text-[var(--ink)]">书籍剪辑</p>
             <p className="mt-2 text-sm leading-relaxed text-[var(--ink-muted)]">
               《一生》式讲故事 → 首尾帧开场动效 → MiniMax 配音 → 约 3 分钟
-            </p>
-          </Link>
-          <Link
-            href="/cut"
-            className="rounded-[28px] bg-white/75 p-8 shadow-sm transition hover:bg-white"
-          >
-            <p className="font-display text-2xl text-[var(--ink)]">混剪视频</p>
-            <p className="mt-2 text-sm leading-relaxed text-[var(--ink-muted)]">
-              一句话 brief → 分镜静帧 → 预览成片
             </p>
           </Link>
         </div>

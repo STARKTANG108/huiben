@@ -114,12 +114,10 @@ class EdgeTTSProvider:
             voice = "zh-CN-XiaoxiaoNeural"
         root = project_dir(settings, getattr(req, "storage_key", None) or req.project_id)
         part_paths: list[Path] = []
-        # 绘本慢讲；书籍/人生另有通道。Edge rate：负值更慢
+        # 绘本慢讲；书籍说书稍快。Edge rate：负值更慢
         api = (getattr(req, "api_prefix", None) or "/api/projects").strip()
         if api.startswith("/api/book"):
             rate = "-5%"
-        elif api.startswith("/api/life"):
-            rate = "+0%"
         else:
             rate = "-15%"  # 绘本讲故事
 

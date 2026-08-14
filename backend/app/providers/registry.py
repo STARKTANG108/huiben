@@ -16,7 +16,6 @@ from app.providers.custom_openai_media import (
     CustomOpenAITTSProvider,
 )
 from app.providers.edge_tts_provider import EdgeTTSProvider
-from app.providers.flux_image import FluxImageProvider
 from app.providers.llm_script import LLMScriptProvider
 from app.providers.llm_story import LLMStoryProvider
 from app.providers.llm_storyboard import LLMStoryboardProvider
@@ -61,8 +60,6 @@ def get_image_provider(settings: Settings | None = None) -> ImageProvider:
         return PollinationsImageProvider()
     if preset == "custom":
         return CustomOpenAIImageProvider()
-    if preset == "flux":
-        return FluxImageProvider()
     return MockImageProvider()
 
 

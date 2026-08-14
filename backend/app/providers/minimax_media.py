@@ -39,13 +39,6 @@ BOOK_ILLUSTRATION_STYLE_EN = (
     "no text, no watermark, no subtitle, no logo"
 )
 
-LIFE_COMIC_STYLE_EN = (
-    "Japanese healing illustration style with cute round-faced East Asian character, "
-    "Chinese small-town realistic environments, warm muted orange beige cream palette, "
-    "soft film grain, slow cinematic still, vertical 9:16 full-bleed, "
-    "no text, no watermark, no subtitle, no logo"
-)
-
 
 def _style_prefix(style: str) -> str:
     s = (style or "").strip()
@@ -54,8 +47,6 @@ def _style_prefix(style: str) -> str:
         return s[7:].strip() or BOOK_ILLUSTRATION_STYLE_EN
     if low in ("book", "book_illustration", "storybook"):
         return BOOK_ILLUSTRATION_STYLE_EN
-    if low in ("life", "life_comic", "manhua", "comic", "modern", "life_modern"):
-        return LIFE_COMIC_STYLE_EN
     return WATERCOLOR_STYLE_EN
 
 
@@ -223,37 +214,6 @@ def _safe_fallback_image_prompt(req: ImageRequest) -> str:
         f"{style}. {scene}. artistic cinematic still, no violence, no text, vertical 9:16",
         drop_cjk=True,
     )[:1200]
-
-
-def _life_tts_voice_setting(shot, *, story_mood: str, total: int) -> dict:
-    """县城安稳·治愈：整体克制偏慢，对比/自省略收，结尾略暖。"""
-    idx = getattr(shot, "index", 0) or 0
-    mood = (getattr(shot, "mood", None) or story_mood or "inspiring").strip().lower()
-    progress = idx / max(1, total - 1)
-    speed = 0.94
-    pitch = 0
-    emotion: str | None = "calm"
-
-    if idx == 0 or mood == "hook":
-        speed = 0.96
-        pitch = 0
-        emotion = "calm"
-    elif mood in ("reflective", "melancholic", "sad") or (
-        progress >= 0.55 and progress < 0.82
-    ):
-        speed = 0.90
-        pitch = -1
-        emotion = "sad"
-    elif progress >= 0.82 or mood in ("triumphant", "climax", "inspiring"):
-        speed = 0.94
-        pitch = 0
-        emotion = "happy"
-    elif mood in ("fierce", "tense", "angry"):
-        speed = 0.98
-        pitch = 0
-        emotion = "calm"
-
-    return {"speed": speed, "vol": 1.0, "pitch": pitch, "emotion": emotion}
 
 
 def _pictale_tts_voice_setting(shot, *, total: int) -> dict:
@@ -489,17 +449,8 @@ class MinimaxTTSProvider:
         settings = get_settings()
         root = project_dir(settings, req.storage_key or req.project_id)
         part_paths: list[Path] = []
-        is_life = (getattr(req, "api_prefix", None) or "").startswith("/api/life")
         is_book = (getattr(req, "api_prefix", None) or "").startswith("/api/book")
-        is_pictale = not is_life and not is_book
-        story_mood = "inspiring"
-        if is_life and req.storyboard.shots:
-            moods = [
-                (s.mood or "").strip()
-                for s in req.storyboard.shots
-                if (s.mood or "").strip() not in ("hook", "climax", "reflective")
-            ]
-            story_mood = moods[len(moods) // 2] if moods else "inspiring"
+        is_pictale = not is_book
         total_shots = len(req.storyboard.shots)
 
         async with httpx.AsyncClient(timeout=120.0, follow_redirects=True) as client:
@@ -507,14 +458,11 @@ class MinimaxTTSProvider:
                 if i > 0:
                     await asyncio.sleep(0.8)
                 text = (shot.narration or "").strip() or "……"
-                if is_life:
-                    extra = _life_tts_voice_setting(
-                        shot, story_mood=story_mood, total=total_shots
-                    )
-                elif is_pictale:
-                    extra = _pictale_tts_voice_setting(shot, total=total_shots)
-                else:
-                    extra = None
+                extra = (
+                    _pictale_tts_voice_setting(shot, total=total_shots)
+                    if is_pictale
+                    else None
+                )
                 audio_bytes, api_dur = None, None
                 last_err: Exception | None = None
                 for attempt in range(4):

@@ -66,15 +66,6 @@ def characters_lock_en(characters: list) -> str:
     )
 
 
-def life_characters_lock_en(characters: list) -> str:
-    """Stricter lock for 人生副本."""
-    base = characters_lock_en(characters)
-    return (
-        f"{base}. SAME FACE, hairstyle, age, outfit palette across every frame; "
-        "one consistent protagonist; do not swap actors or ethnicity."
-    )
-
-
 def cast_reference_prompt_en(characters: list) -> str:
     """
     Prompt for a one-shot character design sheet (合影设定稿).

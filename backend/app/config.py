@@ -13,19 +13,6 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    provider_story: str = "mock"
-    provider_script: str = "mock"
-    provider_storyboard: str = "mock"
-    provider_image: str = "mock"
-    provider_tts: str = "mock"
-    provider_bgm: str = "mock"
-    provider_video: str = "mock"
-
-    openai_api_key: str | None = None
-    openai_base_url: str = "https://api.openai.com/v1"
-    cosyvoice_api_key: str | None = None
-    image_api_key: str | None = None
-
     storage_dir: str = "storage"
     cors_origins: str = "http://localhost:3000,http://127.0.0.1:3000"
 

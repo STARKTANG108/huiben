@@ -6,12 +6,6 @@
       "sourceType": "github",
       "skillPath": "skills/baoyu-image-gen/SKILL.md",
       "computedHash": "388a4e2ae4e1953476dcbda56f446a9f6896fd4423cad2f9ba66ad9c06cbc044"
-    },
-    "baoyu-xhs-images": {
-      "source": "JimLiu/baoyu-skills",
-      "sourceType": "github",
-      "skillPath": "skills/baoyu-xhs-images/SKILL.md",
-      "computedHash": "e72f5920b91ded0902b83fd867497ba15aad072e38d3f78e032397e3170d72bb"
     }
   }
 }

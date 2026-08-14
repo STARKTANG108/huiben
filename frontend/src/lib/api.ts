@@ -1,15 +1,8 @@
 import type {
   BookProject,
-  CutProject,
-  CustomBookOrder,
-  CustomBookOrderListItem,
-  LifeOptions,
-  LifeProject,
-  OutfitProject,
   Project,
   StepName,
   StoryParagraph,
-  XhsProject,
 } from "./types";
 
 // 同源部署：不配置 NEXT_PUBLIC_API_BASE 时，请求走 Next.js rewrites 代理到后端
@@ -55,8 +48,6 @@ export type RuntimeSettings = {
   image_api_key: string;
   image_api_key_set?: boolean;
   image_model: string;
-  replicate_api_token?: string;
-  replicate_api_token_set?: boolean;
   tts_preset: string;
   tts_base_url: string;
   tts_api_key: string;
@@ -77,6 +68,7 @@ export type RuntimeSettings = {
 };
 
 export const api = {
+  // ---- 儿童绘本视频 ----
   createProject(data: {
     theme: string;
     age_range: string;
@@ -117,51 +109,7 @@ export const api = {
     });
   },
 
-  getSettings(): Promise<RuntimeSettings> {
-    return request("/api/settings");
-  },
-
-  saveSettings(data: Record<string, string>): Promise<RuntimeSettings> {
-    return request("/api/settings", {
-      method: "PUT",
-      body: JSON.stringify(data),
-    });
-  },
-
-  createOutfit(data: {
-    season: string;
-    city: string;
-    vibe: string;
-    scene?: string;
-    notes?: string;
-  }): Promise<OutfitProject> {
-    return request("/api/outfits", {
-      method: "POST",
-      body: JSON.stringify(data),
-    });
-  },
-
-  getOutfit(id: string): Promise<OutfitProject> {
-    return request(`/api/outfits/${id}`);
-  },
-
-  createXhs(data: {
-    url: string;
-    notes?: string;
-    max_cards?: number;
-    style?: string;
-    layout?: string;
-  }): Promise<XhsProject> {
-    return request("/api/xhs", {
-      method: "POST",
-      body: JSON.stringify(data),
-    });
-  },
-
-  getXhs(id: string): Promise<XhsProject> {
-    return request(`/api/xhs/${id}`);
-  },
-
+  // ---- 书籍剪辑 ----
   createBook(data: {
     book_title: string;
     theme?: string;
@@ -189,145 +137,15 @@ export const api = {
     });
   },
 
-  createLife(data: {
-    premise?: string;
-    vibe?: string;
-    notes?: string;
-    title?: string;
-    story_text?: string;
-    target_sec?: number;
-    tts_voice?: string;
-    bgm_track_id?: string;
-  }): Promise<LifeProject> {
-    return request("/api/life", {
-      method: "POST",
+  // ---- 模型配置 ----
+  getSettings(): Promise<RuntimeSettings> {
+    return request("/api/settings");
+  },
+
+  saveSettings(data: Record<string, string>): Promise<RuntimeSettings> {
+    return request("/api/settings", {
+      method: "PUT",
       body: JSON.stringify(data),
     });
-  },
-
-  getLifeOptions(): Promise<LifeOptions> {
-    return request("/api/life/options");
-  },
-
-  getLife(id: string): Promise<LifeProject> {
-    return request(`/api/life/${id}`);
-  },
-
-  runLifeStep(id: string, step: StepName): Promise<LifeProject> {
-    return request(`/api/life/${id}/steps/${step}`, { method: "POST" });
-  },
-
-  runLifePipeline(id: string, from_step?: StepName): Promise<LifeProject> {
-    return request(`/api/life/${id}/run`, {
-      method: "POST",
-      body: JSON.stringify(from_step ? { from_step } : {}),
-    });
-  },
-
-  createCut(data: {
-    brief: string;
-    workflow?: string;
-    duration?: number;
-    format?: string;
-    notes?: string;
-  }): Promise<CutProject> {
-    return request("/api/cut", {
-      method: "POST",
-      body: JSON.stringify(data),
-    });
-  },
-
-  getCut(id: string): Promise<CutProject> {
-    return request(`/api/cut/${id}`);
-  },
-
-  listCustomBooks(): Promise<CustomBookOrderListItem[]> {
-    return request("/api/custom-book/orders");
-  },
-
-  getCustomBook(id: string): Promise<CustomBookOrder> {
-    return request(`/api/custom-book/orders/${id}`);
-  },
-
-  async createCustomBook(form: FormData): Promise<CustomBookOrder> {
-    const res = await fetch(`${API_BASE}/api/custom-book/orders`, {
-      method: "POST",
-      body: form,
-      cache: "no-store",
-    });
-    if (!res.ok) {
-      let detail = res.statusText;
-      try {
-        const body = await res.json();
-        detail = body.detail || JSON.stringify(body);
-      } catch {
-        /* ignore */
-      }
-      throw new Error(typeof detail === "string" ? detail : JSON.stringify(detail));
-    }
-    return res.json() as Promise<CustomBookOrder>;
-  },
-
-  prepareCustomBook(id: string): Promise<CustomBookOrder> {
-    return request(`/api/custom-book/orders/${id}/prepare`, { method: "POST" });
-  },
-
-  regenerateCustomBookCharacter(id: string): Promise<CustomBookOrder> {
-    return request(`/api/custom-book/orders/${id}/character/regenerate`, {
-      method: "POST",
-    });
-  },
-
-  confirmCustomBookCharacter(id: string): Promise<CustomBookOrder> {
-    return request(`/api/custom-book/orders/${id}/character/confirm`, {
-      method: "POST",
-    });
-  },
-
-  updateCustomBookCharacterPrompt(
-    id: string,
-    character_prompt: string
-  ): Promise<CustomBookOrder> {
-    return request(`/api/custom-book/orders/${id}/character/prompt`, {
-      method: "PATCH",
-      body: JSON.stringify({ character_prompt }),
-    });
-  },
-
-  generateCustomBookPages(id: string): Promise<CustomBookOrder> {
-    return request(`/api/custom-book/orders/${id}/pages/generate`, {
-      method: "POST",
-    });
-  },
-
-  regenerateCustomBookPage(id: string, pageNo: number): Promise<CustomBookOrder> {
-    return request(`/api/custom-book/orders/${id}/pages/${pageNo}/regenerate`, {
-      method: "POST",
-    });
-  },
-
-  updateCustomBookPageText(
-    id: string,
-    pageNo: number,
-    text: string
-  ): Promise<CustomBookOrder> {
-    return request(`/api/custom-book/orders/${id}/pages/${pageNo}/text`, {
-      method: "PATCH",
-      body: JSON.stringify({ text }),
-    });
-  },
-
-  updateCustomBookParentMessage(
-    id: string,
-    parent_message: string
-  ): Promise<CustomBookOrder> {
-    return request(`/api/custom-book/orders/${id}/parent-message`, {
-      method: "PATCH",
-      body: JSON.stringify({ parent_message }),
-    });
-  },
-
-  createCustomBookPdf(id: string): Promise<CustomBookOrder> {
-    return request(`/api/custom-book/orders/${id}/pdf`, { method: "POST" });
   },
 };

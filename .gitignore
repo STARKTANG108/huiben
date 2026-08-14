@@ -16,10 +16,6 @@ backend/runtime_config.json
 # 用户数据 / 生成产物
 backend/storage/*
 !backend/storage/.gitkeep
-backend/assets/bgm/life/*.mp3
-backend/assets/bgm/life/*.ogg
-backend/assets/bgm/life/*.flac
-backend/assets/bgm/life/*.wav
 
 # ---------- Python ----------
 backend/.venv/
@@ -42,6 +38,3 @@ frontend/tsconfig.tsbuildinfo
 *.log
 .idea/
 .vscode/
-
-# ---------- 第三方冗余副本（含自身 git 历史，不入库） ----------
-_vendor_qiaomu_cut/

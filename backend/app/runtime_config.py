@@ -10,7 +10,7 @@ from pydantic import BaseModel, Field
 CONFIG_PATH = Path(__file__).resolve().parent.parent / "data" / "runtime_config.json"
 
 TextPreset = Literal["mock", "gemini", "groq", "deepseek", "custom"]
-ImagePreset = Literal["mock", "pollinations", "custom", "minimax", "flux"]
+ImagePreset = Literal["mock", "pollinations", "custom", "minimax"]
 TTSPreset = Literal["mock", "edge", "custom", "minimax"]
 
 
@@ -26,9 +26,6 @@ class RuntimeConfig(BaseModel):
     image_base_url: str = ""
     image_api_key: str = ""
     image_model: str = ""
-
-    # custom-book Flux（Replicate）专用，不影响其他模块的 image_api_key / MiniMax
-    replicate_api_token: str = ""
 
     tts_preset: TTSPreset = "minimax"
     tts_base_url: str = ""
@@ -104,17 +101,11 @@ IMAGE_PRESETS: dict[str, dict[str, str]] = {
         "model": "flux",
         "hint": "无需 Key，联网即可生成",
     },
-    "flux": {
-        "label": "Flux（CatsAPI）",
-        "base_url": "https://catsapi.com/api",
-        "model": "flux2Pro",
-        "hint": "儿童定制绘本 custom-book 专用 · catsapi.com · Token 形如 cats-…",
-    },
     "custom": {
         "label": "自定义生图 API（suxi 等）",
         "base_url": "https://new.suxi.ai/v1",
         "model": "jimeng-3.0",
-        "hint": "OpenAI Images 兼容接口；职场穿搭 / 小红绿书仍用此 Key",
+        "hint": "OpenAI Images 兼容接口",
     },
 }
 
@@ -231,7 +222,7 @@ class RuntimeConfigStore:
             for k, v in patch.items():
                 if k in data and v is not None:
                     # Keep existing key if UI sends masked placeholder
-                    if (k.endswith("_api_key") or k.endswith("_api_token") or k == "replicate_api_token") and isinstance(v, str):
+                    if k.endswith(("_api_key", "_api_token")) and isinstance(v, str):
                         cleaned = v.strip()
                         if not cleaned or cleaned.startswith("••••"):
                             continue
@@ -266,9 +257,9 @@ class RuntimeConfigStore:
         ip = data.get("image_preset", "minimax")
         if ip in IMAGE_PRESETS and ip != "custom":
             preset = IMAGE_PRESETS[ip]
-            if ip in ("minimax", "flux") or not data.get("image_base_url"):
+            if ip == "minimax" or not data.get("image_base_url"):
                 data["image_base_url"] = preset["base_url"] or data.get("image_base_url", "")
-            if ip in ("minimax", "flux") or not data.get("image_model"):
+            if ip == "minimax" or not data.get("image_model"):
                 data["image_model"] = preset["model"] or data.get("image_model", "")
 
         tp_tts = data.get("tts_preset", "minimax")
@@ -294,7 +285,6 @@ class RuntimeConfigStore:
             "image_api_key",
             "tts_api_key",
             "minimax_api_key",
-            "replicate_api_token",
             "toapis_api_key",
         ):
             val = data.get(key) or ""

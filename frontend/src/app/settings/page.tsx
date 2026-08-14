@@ -13,7 +13,6 @@ type FormState = {
   image_base_url: string;
   image_api_key: string;
   image_model: string;
-  replicate_api_token: string;
   tts_preset: string;
   tts_base_url: string;
   tts_api_key: string;
@@ -33,7 +32,6 @@ const EMPTY: FormState = {
   image_base_url: "",
   image_api_key: "",
   image_model: "",
-  replicate_api_token: "",
   tts_preset: "minimax",
   tts_base_url: "",
   tts_api_key: "",
@@ -113,17 +111,11 @@ const FALLBACK_PRESETS: RuntimeSettings["presets"] = {
       model: "flux",
       hint: "无需 Key，联网即可生成",
     },
-    flux: {
-      label: "Flux（CatsAPI）",
-      base_url: "https://catsapi.com/api",
-      model: "flux2Pro",
-      hint: "儿童定制绘本 custom-book 专用 · catsapi.com · Token 形如 cats-…",
-    },
     custom: {
       label: "自定义生图 API（suxi 等）",
       base_url: "https://new.suxi.ai/v1",
       model: "jimeng-3.0",
-      hint: "OpenAI Images 兼容接口；职场穿搭 / 小红绿书仍用此 Key",
+      hint: "OpenAI Images 兼容接口",
     },
   },
   tts: {
@@ -167,7 +159,6 @@ export default function SettingsPage() {
     image: false,
     tts: false,
     minimax: false,
-    cats: false,
     toapis: false,
   });
   const [keyHint, setKeyHint] = useState({
@@ -175,7 +166,6 @@ export default function SettingsPage() {
     image: "",
     tts: "",
     minimax: "",
-    cats: "",
     toapis: "",
   });
   const [msg, setMsg] = useState<string | null>(null);
@@ -195,7 +185,6 @@ export default function SettingsPage() {
           image: !!s.image_api_key_set,
           tts: !!s.tts_api_key_set,
           minimax: !!s.minimax_api_key_set,
-          cats: !!s.replicate_api_token_set,
           toapis: !!s.toapis_api_key_set,
         });
         setKeyHint({
@@ -203,7 +192,6 @@ export default function SettingsPage() {
           image: s.image_api_key || "",
           tts: s.tts_api_key || "",
           minimax: s.minimax_api_key || "",
-          cats: s.replicate_api_token || "",
           toapis: s.toapis_api_key || "",
         });
         setForm({
@@ -215,7 +203,6 @@ export default function SettingsPage() {
           image_base_url: s.image_base_url,
           image_api_key: "",
           image_model: s.image_model,
-          replicate_api_token: "",
           tts_preset: s.tts_preset,
           tts_base_url: s.tts_base_url,
           tts_api_key: "",
@@ -287,7 +274,6 @@ export default function SettingsPage() {
       if (!payload.image_api_key) delete payload.image_api_key;
       if (!payload.tts_api_key) delete payload.tts_api_key;
       if (!payload.minimax_api_key) delete payload.minimax_api_key;
-      if (!payload.replicate_api_token) delete payload.replicate_api_token;
       if (!payload.toapis_api_key) delete payload.toapis_api_key;
       await api.saveSettings(payload);
       const refreshed = await api.getSettings();
@@ -296,7 +282,6 @@ export default function SettingsPage() {
         image: !!refreshed.image_api_key_set,
         tts: !!refreshed.tts_api_key_set,
         minimax: !!refreshed.minimax_api_key_set,
-        cats: !!refreshed.replicate_api_token_set,
         toapis: !!refreshed.toapis_api_key_set,
       });
       setKeyHint({
@@ -304,7 +289,6 @@ export default function SettingsPage() {
         image: refreshed.image_api_key || "",
         tts: refreshed.tts_api_key || "",
         minimax: refreshed.minimax_api_key || "",
-        cats: refreshed.replicate_api_token || "",
         toapis: refreshed.toapis_api_key || "",
       });
       setMsg("已保存。返回首页即可开始制作。");
@@ -314,7 +298,6 @@ export default function SettingsPage() {
         image_api_key: "",
         tts_api_key: "",
         minimax_api_key: "",
-        replicate_api_token: "",
         toapis_api_key: "",
         image_preset: refreshed.image_preset,
         image_base_url: refreshed.image_base_url,
@@ -494,28 +477,6 @@ export default function SettingsPage() {
                 autoComplete="off"
               />
             </label>
-          {(form.image_preset === "flux" || keySet.cats) && (
-            <label className="mt-4 block">
-              <span className="label">
-                CatsAPI Token（定制绘本 Flux）
-                {keySet.cats ? (
-                  <span className="ml-2 font-normal text-[var(--leaf)]">
-                    已保存 {keyHint.cats}
-                  </span>
-                ) : (
-                  <span className="ml-2 font-normal text-red-500">未配置</span>
-                )}
-              </span>
-              <input
-                className="input"
-                type="password"
-                placeholder="cats-…（catsapi.com）"
-                value={form.replicate_api_token}
-                onChange={(e) => setField("replicate_api_token", e.target.value)}
-                autoComplete="off"
-              />
-            </label>
-          )}
           {form.image_preset === "custom" && (
             <div className="mt-4 space-y-3">
               <label className="block">
@@ -540,7 +501,7 @@ export default function SettingsPage() {
                 <input
                   className="input"
                   type="password"
-                  placeholder="备用；小红绿书已改用 MiniMax"
+                  placeholder="备用；自定义生图 API Key"
                   value={form.image_api_key}
                   onChange={(e) => setField("image_api_key", e.target.value)}
                   autoComplete="off"

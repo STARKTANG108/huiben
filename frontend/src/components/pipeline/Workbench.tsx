@@ -1,14 +1,14 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { api, assetUrl } from "@/lib/api";
-import type { BookProject, LifeProject, Project, StepName } from "@/lib/types";
-import { LIFE_PIPELINE_STEPS, PIPELINE_STEPS } from "@/lib/types";
+import type { BookProject, Project, StepName } from "@/lib/types";
+import { PIPELINE_STEPS } from "@/lib/types";
 import { useJobPoll } from "@/lib/useJobPoll";
 
-type PipelineProject = Project | BookProject | LifeProject;
-type WorkbenchMode = "pictale" | "book" | "life";
+type PipelineProject = Project | BookProject;
+type WorkbenchMode = "pictale" | "book";
 
 interface WorkbenchProps {
   projectId: string;
@@ -24,9 +24,7 @@ export function Workbench({ projectId, mode = "pictale" }: WorkbenchProps) {
     const p =
       mode === "book"
         ? await api.getBook(projectId)
-        : mode === "life"
-          ? await api.getLife(projectId)
-          : await api.getProject(projectId);
+        : await api.getProject(projectId);
     setProject(p);
     return p;
   }, [projectId, mode]);
@@ -34,28 +32,6 @@ export function Workbench({ projectId, mode = "pictale" }: WorkbenchProps) {
   useEffect(() => {
     refresh().catch((e) => setError(String(e.message || e)));
   }, [refresh]);
-
-  // 人生副本：进入工作台后若还在 pending，自动开跑（每个项目只触发一次）
-  const autoStartedRef = useRef<string | null>(null);
-  useEffect(() => {
-    if (mode !== "life" || !project) return;
-    if (autoStartedRef.current === project.id) return;
-    if (project.job_status !== "pending") return;
-    if (!("story_text" in project) || !(project as LifeProject).story_text) return;
-    autoStartedRef.current = project.id;
-    let cancelled = false;
-    (async () => {
-      try {
-        const p = await api.runLifePipeline(project.id);
-        if (!cancelled) setProject(p);
-      } catch {
-        /* ignore — may already be running */
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [mode, project]);
 
   useJobPoll(project?.job_status === "running", refresh, 3000);
 
@@ -67,9 +43,7 @@ export function Workbench({ projectId, mode = "pictale" }: WorkbenchProps) {
       const p =
         mode === "book"
           ? await api.runBookPipeline(project.id)
-          : mode === "life"
-            ? await api.runLifePipeline(project.id)
-            : await api.runPipeline(project.id);
+          : await api.runPipeline(project.id);
       setProject(p);
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
@@ -86,9 +60,7 @@ export function Workbench({ projectId, mode = "pictale" }: WorkbenchProps) {
       const p =
         mode === "book"
           ? await api.runBookStep(project.id, step)
-          : mode === "life"
-            ? await api.runLifeStep(project.id, step)
-            : await api.runStep(project.id, step);
+          : await api.runStep(project.id, step);
       setProject(p);
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
@@ -108,7 +80,7 @@ export function Workbench({ projectId, mode = "pictale" }: WorkbenchProps) {
 
   const running = busy || project.job_status === "running";
   const video = project.video;
-  const stepList = mode === "life" ? LIFE_PIPELINE_STEPS : PIPELINE_STEPS;
+  const stepList = PIPELINE_STEPS;
   const doneCount = stepList.filter(
     (s) => project.steps[s.id]?.status === "completed"
   ).length;
@@ -116,7 +88,6 @@ export function Workbench({ projectId, mode = "pictale" }: WorkbenchProps) {
   let headline = project.story?.title || "";
   if (!headline) {
     if ("book_title" in project) headline = project.book_title;
-    else if ("premise" in project) headline = project.premise || "人生副本";
     else headline = project.theme;
   }
 
@@ -129,21 +100,13 @@ export function Workbench({ projectId, mode = "pictale" }: WorkbenchProps) {
           durationHint: " · 成片约 3 分钟 · 前 8 秒开场动效",
           showCover: true,
         }
-      : mode === "life"
-        ? {
-            backHref: "/life",
-            backLabel: "← 再开一条人生",
-            storyLabel: "平行人生 · 假如故事",
-            durationHint: " · 成片约 30 秒（试用）",
-            showCover: true,
-          }
-        : {
-            backHref: "/pictale",
-            backLabel: "← 新主题",
-            storyLabel: "故事",
-            durationHint: "",
-            showCover: false,
-          };
+      : {
+          backHref: "/pictale",
+          backLabel: "← 新主题",
+          storyLabel: "故事",
+          durationHint: "",
+          showCover: false,
+        };
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
@@ -156,9 +119,6 @@ export function Workbench({ projectId, mode = "pictale" }: WorkbenchProps) {
           <p className="mt-1 text-sm text-[var(--ink-muted)]">
             {mode === "book" && "book_title" in project
               ? `《${project.book_title}》 · `
-              : ""}
-            {mode === "life" && "vibe" in project && project.vibe
-              ? `${project.vibe} · `
               : ""}
             {doneCount}/{stepList.length} 步完成
             {project.job_status === "running"
@@ -219,8 +179,7 @@ export function Workbench({ projectId, mode = "pictale" }: WorkbenchProps) {
           <p className="mt-2 text-[var(--ink-muted)]">{project.story.summary}</p>
           {project.story.lessons && project.story.lessons.length > 0 && (
             <p className="mt-2 text-sm text-[var(--accent)]">
-              {mode === "life" ? "人生节点：" : "爽点："}
-              {project.story.lessons.join(" · ")}
+              爽点：{project.story.lessons.join(" · ")}
             </p>
           )}
           <div className="mt-3 space-y-2 text-sm leading-relaxed">
@@ -233,12 +192,7 @@ export function Workbench({ projectId, mode = "pictale" }: WorkbenchProps) {
 
       {project.storyboard?.shots.some((s) => s.image_asset_id) && (
         <section className="mb-6">
-          <h2 className="font-display mb-3 text-xl">
-            配图
-            {mode === "life"
-              ? `（${project.storyboard.shots.length} 镜）`
-              : ""}
-          </h2>
+          <h2 className="font-display mb-3 text-xl">配图</h2>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             {project.storyboard.shots.map((shot) => {
               const asset = shot.image_asset_id
@@ -255,11 +209,6 @@ export function Workbench({ projectId, mode = "pictale" }: WorkbenchProps) {
                     />
                   ) : (
                     <div className="aspect-[9/16] bg-[var(--sand)]" />
-                  )}
-                  {mode === "life" && shot.on_screen_text && (
-                    <p className="px-2 py-1.5 text-center text-xs text-[var(--ink-muted)]">
-                      {shot.on_screen_text}
-                    </p>
                   )}
                 </div>
               );

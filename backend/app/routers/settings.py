@@ -27,8 +27,6 @@ class SettingsUpdate(BaseModel):
     image_api_key: str | None = None
     image_model: str | None = None
 
-    replicate_api_token: str | None = None
-
     tts_preset: Literal["mock", "edge", "custom", "minimax"] | None = None
     tts_base_url: str | None = None
     tts_api_key: str | None = None
