@@ -1,0 +1,47 @@
+# ---------- 密钥 / 隐私：绝对不入库 ----------
+# 任何 .env / 配置文件（含真实 API Key）
+.env
+*.env
+.env.*
+!.env.example
+!.env.local.example
+backend/.env
+frontend/.env.local
+.baoyu-skills/.env
+
+# 运行时配置（含真实模型 Key，勿提交）
+backend/data/
+backend/runtime_config.json
+
+# 用户数据 / 生成产物
+backend/storage/*
+!backend/storage/.gitkeep
+backend/assets/bgm/life/*.mp3
+backend/assets/bgm/life/*.ogg
+backend/assets/bgm/life/*.flac
+backend/assets/bgm/life/*.wav
+
+# ---------- Python ----------
+backend/.venv/
+__pycache__/
+backend/**/__pycache__/
+backend/*.egg-info/
+*.pyc
+
+# ---------- Node ----------
+node_modules/
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/next-env.d.ts
+frontend/tsconfig.tsbuildinfo
+*.tsbuildinfo
+
+# ---------- OS / IDE / 日志 ----------
+.DS_Store
+*.log
+.idea/
+.vscode/
+
+# ---------- 第三方冗余副本（含自身 git 历史，不入库） ----------
+_vendor_qiaomu_cut/

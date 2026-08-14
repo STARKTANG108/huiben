@@ -1,0 +1,51 @@
+/* 本地字体栈（不再从 Google Fonts 拉取，避免国内网络卡顿）：
+   Nunito → 系统无衬线；Fraunces → 衬线回退 */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --cream: #fff8f0;
+  --sand: #f0ddd0;
+  --ink: #3a2a22;
+  --ink-muted: #7a6558;
+  --accent: #e07a4b;
+  --leaf: #6a9b7a;
+  --sun: #f0c45c;
+  --sky: #b8d4e8;
+  --background: var(--cream);
+  --foreground: var(--ink);
+}
+
+body {
+  color: var(--ink);
+  background:
+    radial-gradient(ellipse 80% 50% at 10% -10%, #ffe8d6 0%, transparent 55%),
+    radial-gradient(ellipse 60% 40% at 90% 0%, #d6eaf5 0%, transparent 50%),
+    linear-gradient(180deg, #fff8f0 0%, #f7ebe1 45%, #efe4d8 100%);
+  font-family: "Nunito", "PingFang SC", "Hiragino Sans GB", system-ui,
+    -apple-system, sans-serif;
+  min-height: 100vh;
+}
+
+.font-display {
+  font-family: "Fraunces", Georgia, "Songti SC", "STSong", serif;
+}
+
+@layer components {
+  .label {
+    @apply mb-1.5 block text-sm font-semibold text-[var(--ink-muted)];
+  }
+  .input {
+    @apply w-full rounded-2xl border border-[var(--sand)] bg-white/80 px-4 py-2.5 text-[var(--ink)] outline-none transition focus:border-[var(--accent)];
+  }
+  .input:focus {
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);
+  }
+  .btn-primary {
+    @apply rounded-2xl bg-[var(--accent)] px-5 py-2.5 font-semibold text-white shadow-md transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-60;
+  }
+  .btn-secondary {
+    @apply rounded-2xl border border-[var(--sand)] bg-white/80 px-5 py-2.5 font-semibold text-[var(--ink)] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60;
+  }
+}

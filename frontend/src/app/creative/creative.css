@@ -1,0 +1,84 @@
+/* AI Creative Director — scoped visual tokens (do not leak into Pictale). */
+
+.creative-root {
+  --cd-bg: #0a0c10;
+  --cd-surface: #12161e;
+  --cd-ink: #f2f0eb;
+  --cd-muted: #9a958c;
+  --cd-accent: #c4a574;
+  --cd-accent-soft: rgba(196, 165, 116, 0.18);
+  --cd-line: rgba(242, 240, 235, 0.08);
+  --background: var(--cd-bg);
+  --foreground: var(--cd-ink);
+
+  /* Space Grotesk 优先，未安装时回退系统无衬线字体（构建不再依赖 Google Fonts） */
+  --font-creative-sans: "Space Grotesk", "PingFang SC", "Hiragino Sans GB",
+    system-ui, -apple-system, sans-serif;
+  /* Instrument Serif 优先，未安装时回退衬线字体 */
+  --font-creative-display: "Instrument Serif", Georgia, "Songti SC", serif;
+
+  color: var(--cd-ink);
+  background-color: var(--cd-bg);
+  font-family: var(--font-creative-sans);
+  min-height: 100vh;
+}
+
+.creative-root .font-creative-display {
+  font-family: var(--font-creative-display), Georgia, serif;
+}
+
+@keyframes cd-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cd-glow-drift {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.55;
+  }
+  50% {
+    transform: translate(4%, -3%) scale(1.06);
+    opacity: 0.75;
+  }
+}
+
+@keyframes cd-grain {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(-2%, -2%);
+  }
+}
+
+.cd-animate-fade-up {
+  animation: cd-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.cd-animate-fade-up-delay-1 {
+  animation: cd-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
+}
+
+.cd-animate-fade-up-delay-2 {
+  animation: cd-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.24s both;
+}
+
+.cd-animate-fade-up-delay-3 {
+  animation: cd-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.36s both;
+}
+
+.cd-glow {
+  animation: cd-glow-drift 14s ease-in-out infinite;
+}
+
+.cd-grain {
+  animation: cd-grain 0.4s steps(2) infinite;
+}
