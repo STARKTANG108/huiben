@@ -48,6 +48,38 @@ chmod +x scripts/dev.sh
 - 后端：http://localhost:8000
 - API 文档：http://localhost:8000/docs
 
+## 一键部署
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/STARKTANG108/huiben)
+
+支持 **Render / Railway / Zeabur** 等容器平台，仓库内已带：
+
+- `docker-compose.yml` — Railway / Zeabur 自动识别；本地 `docker compose up -d` 亦可
+- `render.yaml` — Render 蓝图（含后端持久盘，重启不丢数据）
+- `backend/Dockerfile` + `frontend/Dockerfile`
+
+### Render（一键）
+
+1. 点击上方按钮（或访问 `https://render.com/deploy?repo=https://github.com/STARKTANG108/huiben`）
+2. 选仓库 → 自动创建 `huiben-backend`（FastAPI + 持久盘）与 `huiben-frontend`（Next.js）
+3. 前端会自动把 `/api/*` 代理到后端，**无需配置任何前端环境变量**
+
+### Railway / Zeabur
+
+1. 控制台 → New Project → Deploy from GitHub repo → 选择 `STARKTANG108/huiben`
+2. 平台识别 `docker-compose.yml`，自动起 backend + frontend
+3. 把 frontend 服务暴露到公网域名即可
+
+### 本地 Docker
+
+```bash
+docker compose up -d --build
+# 前端 http://localhost:3000 · 后端 http://localhost:8000
+```
+
+> 数据持久化：模型 Key（在网页 /settings 里配置）、订单数据库、生成的图片/视频都保存在持久卷中，重启/重新部署不丢失。
+> 模型 Key 永远只存在于你部署实例的环境/配置里，不会写入仓库。
+
 ### 手动启动
 
 ```bash

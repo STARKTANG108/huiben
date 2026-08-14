@@ -1,0 +1,30 @@
+# Pictale 一键部署（docker compose up -d）
+# 前端通过 Next.js rewrites 把 /api/* 代理到 backend，无需配置前端环境变量。
+#
+# 支持平台：Railway / Zeabur（自动识别 docker-compose.yml）、
+# Render（用 render.yaml 蓝图）、本地 Docker 亦可。
+services:
+  backend:
+    build: ./backend
+    image: huiben-backend
+    environment:
+      # 数据全部放 /app/data（含 storage），挂持久卷，重启不丢
+      STORAGE_DIR: /app/data/storage
+      CORS_ORIGINS: http://localhost:3000,http://127.0.0.1:3000,http://frontend:3000
+    volumes:
+      - pictale_data:/app/data
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    image: huiben-frontend
+    depends_on:
+      - backend
+    environment:
+      BACKEND_UPSTREAM: http://backend:8000
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+
+volumes:
+  pictale_data:

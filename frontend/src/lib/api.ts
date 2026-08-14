@@ -12,8 +12,10 @@ import type {
   XhsProject,
 } from "./types";
 
+// 同源部署：不配置 NEXT_PUBLIC_API_BASE 时，请求走 Next.js rewrites 代理到后端
+// （见 next.config.ts 的 /api/:path* → BACKEND_UPSTREAM），本地开发仍可显式指定。
 const API_BASE =
-  process.env.NEXT_PUBLIC_API_BASE?.replace(/\/$/, "") || "http://127.0.0.1:8000";
+  process.env.NEXT_PUBLIC_API_BASE?.replace(/\/$/, "") ?? "";
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, {

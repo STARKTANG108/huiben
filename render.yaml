@@ -1,0 +1,30 @@
+# Render Blueprint：https://render.com/deploy?repo=https://github.com/STARKTANG108/huiben
+# 一键部署两个服务：FastAPI 后端（带持久盘）+ Next.js 前端（同源代理 /api → 后端）
+services:
+  - type: web
+    name: huiben-backend
+    runtime: docker
+    repo: https://github.com/STARKTANG108/huiben
+    plan: starter
+    dockerfilePath: ./backend/Dockerfile
+    disk:
+      name: pictale-data
+      mountPath: /app/data
+      sizeGB: 2
+    envVars:
+      - key: STORAGE_DIR
+        value: /app/data/storage
+
+  - type: web
+    name: huiben-frontend
+    runtime: docker
+    repo: https://github.com/STARKTANG108/huiben
+    plan: starter
+    dockerfilePath: ./frontend/Dockerfile
+    envVars:
+      - key: BACKEND_UPSTREAM
+        fromService:
+          type: web
+          name: huiben-backend
+          property: hostport
+    autoDeploy: true
